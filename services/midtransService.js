@@ -88,11 +88,34 @@ class MidtransService {
             const pembeli = await Pembeli.findByPk(transaksi.pembeliId);
             if (!pembeli) throw new Error('Buyer not found');
 
+            const menu = await MenuMakanan.findByPk(transaksi.menuId);
+            if (!menu) throw new Error('Menu not found');
+
             const mailOptions = {
                 from: 'viananto1234@gmail.com',
                 to: pembeli.email, // Email penerima
                 subject: `Pembayaran Berhasil untuk Pesanan ${transaksi.id}`,
-                text: `Hello ${pembeli.nama},\n\nYour payment for order ${transaksi.id} has been successfully processed.\nTotal amount: ${transaksi.totalHarga}\n\nThank you for your purchase!\n\nBest regards,\nYour Company`
+                html: `
+                    <h2>Pembayaran Berhasil!</h2>
+                    <p>Hi ${pembeli.nama},</p>
+                    <p>Terima kasih atas pesanan Anda! Berikut adalah rincian transaksi Anda:</p>
+                    <table style="border-collapse: collapse; width: 100%;">
+                        <tr>
+                            <th style="border: 1px solid #dddddd; text-align: left; padding: 8px;">Item</th>
+                            <th style="border: 1px solid #dddddd; text-align: left; padding: 8px;">Jumlah</th>
+                            <th style="border: 1px solid #dddddd; text-align: left; padding: 8px;">Harga</th>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${menu.nama}</td>
+                            <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${transaksi.jumlah}</td>
+                            <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">${transaksi.totalHarga}</td>
+                        </tr>
+                    </table>
+                    <p><strong>Total Harga:</strong> ${transaksi.totalHarga}</p>
+                    <p>Kami berharap Anda menikmati pesanan Anda. Jika Anda memiliki pertanyaan atau membutuhkan bantuan lebih lanjut, jangan ragu untuk menghubungi kami.</p>
+                    <p>Salam hangat,</p>
+                    <p>Your Company</p>
+                `
             };
 
             await transporter.sendMail(mailOptions);

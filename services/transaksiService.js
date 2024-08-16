@@ -1,5 +1,6 @@
 const { Transaksi, MenuMakanan, Pembeli } = require('../models');
 const midtransClient = require('midtrans-client');
+const nodemailer = require('nodemailer');
 
 class TransaksiService {
     // Create a new transaksi
@@ -47,6 +48,16 @@ class TransaksiService {
 
             const snapResponse = await snap.createTransaction(paymentParams);
 
+            // Panggil fungsi untuk mengirim email setelah transaksi dibuat
+            await this.sendPaymentEmail({
+                pembeliEmail: pembeli.email,
+                pembeliNama: pembeli.nama,
+                orderId: transaksi.id,
+                menuNama: menu.nama,
+                totalHarga: transaksi.totalHarga,
+                redirect_url: snapResponse.redirect_url
+            });
+
             // Kembalikan transaksi dan Snap URL
             return {
                 transaksi: transaksi.toJSON(),
@@ -54,6 +65,41 @@ class TransaksiService {
             };
         } catch (error) {
             throw error;
+        }
+    }
+
+    // Fungsi untuk mengirim email pembayaran
+    static async sendPaymentEmail({ pembeliEmail, pembeliNama, orderId, menuNama, totalHarga, redirect_url }) {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', // Gunakan provider email yang kamu gunakan
+            auth: {
+                user: 'viananto1234@gmail.com', // Ganti dengan emailmu
+                pass: 'ulxtxyqvdkfwgcgj'   // Ganti dengan password emailmu
+            }
+        });
+
+        const mailOptions = {
+            from: 'viananto1234@gmail.com',
+            to: pembeliEmail,
+            subject: 'Pembayaran Pesanan Anda',
+            html: `
+                <h1>Halo, ${pembeliNama}</h1>
+                <p>Terima kasih telah melakukan pemesanan. Berikut adalah detail pesanan Anda:</p>
+                <ul>
+                    <li><strong>Order ID:</strong> ${orderId}</li>
+                    <li><strong>Nama Menu:</strong> ${menuNama}</li>
+                    <li><strong>Total Harga:</strong> Rp ${totalHarga}</li>
+                </ul>
+                <p>Silakan lakukan pembayaran melalui link berikut:</p>
+                <a href="${redirect_url}">Bayar Sekarang</a>
+            `
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log('Email berhasil dikirim ke ' + pembeliEmail);
+        } catch (error) {
+            console.error('Gagal mengirim email:', error);
         }
     }
 
