@@ -4,7 +4,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Fungsi untuk memuat menu dari API
     const loadMenu = async () => {
         try {
-            const response = await fetch('http://localhost:3000/menu');
+            const token = localStorage.getItem('token'); // Ambil token dari localStorage
+
+            const response = await fetch('http://localhost:3000/menu', {
+                headers: {
+                    'Authorization': `Bearer ${token}` // Kirim token dalam header
+                }
+            });
+
             const menuItems = await response.json();
             menuContainer.innerHTML = ''; // Clear the container
 
@@ -74,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjEsImlhdCI6MTcyMzczNjA3MSwiZXhwIjoxNzIzNzM5NjcxfQ.WeaobmaqQI9WmkaIHlYaQ-M31OQP8JE7Uj9gwdzbKXA' // replace with actual token
+                            'Authorization': `Bearer ${localStorage.getItem('token')}` // Ambil token dari localStorage
                         },
                         body: JSON.stringify({ menuId, jumlah })
                     });
