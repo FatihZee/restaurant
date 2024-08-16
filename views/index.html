@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Menu Makanan</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="menu-container">
+        <!-- Example Menu Item -->
+        <div class="menu-item" data-menu-id="1">
+            <h3>Menu Makanan 1</h3>
+            <p>Harga: <span class="price">10000</span></p>
+            <button class="buy-button">Beli</button>
+            <div class="quantity-controls" style="display: none;">
+                <button class="minus">-</button>
+                <input type="number" class="quantity" value="1" min="1">
+                <button class="plus">+</button>
+                <button class="confirm">Konfirmasi</button>
+            </div>
+        </div>
+        <!-- Add more menu items as needed -->
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
